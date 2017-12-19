@@ -17,8 +17,6 @@ To modify the input, edit the test.c file.
 
 The message here is a random vector of length 'k' and is defined in the test.c file.
 
-***WHEN PROMPTED FOR SEED, ALWAYS ENTER A SEED HAVING A VERY HIGH VALUE***
-
 The following targets are provided: keygen, encrypt, decrypt
 
 To initialize the system:
