@@ -28,18 +28,33 @@ bin_matrix mat_init(int rows, int cols)
 //Return the matrix element at position given by the indices
 unsigned short get_matrix_element(bin_matrix mat, int row_idx, int col_idx)
 {
+  if(row_idx < 0 || row_idx >= mat->rows || col_idx < 0 || col_idx >= mat->cols)
+  {
+    printf("Matrix index out of range\n");
+    exit(0);
+  }
   return mat->data[row_idx * (mat->cols) + col_idx];
 }
 
-//Set the value of matix element at position given by the indices
+//Set the value of matix element at position given by the indices to "val"
 void set_matrix_element(bin_matrix A, int row_idx, int col_idx, unsigned short val)
 {
+  if(row_idx < 0 || row_idx >= A->rows || col_idx < 0 || col_idx >= A->cols)
+  {
+    printf("Matrix index out of range\n");
+    exit(0);
+  }
   mat_element(A, row_idx, col_idx) = val;
 }
 
-//Set the indicated row of the matrix equal to vec
+//Set the indicated row of the matrix A equal to the vector vec
 void set_matrix_row(bin_matrix A, int row, unsigned short* vec)
 {
+  if(row < 0 || row >= A->rows)
+  {
+    printf("Row index out of range\n");
+    exit(0);
+  }
   for(int i = 0; i < A->cols; i++)
   {
     set_matrix_element(A, row, i, vec[i]);
@@ -78,9 +93,14 @@ bin_matrix mat_copy(bin_matrix A)
   return B;
 }
 
-//Add row1 to row2
+//Add row1 to row2 of matrix A
 bin_matrix add_rows(bin_matrix A,int row1, int row2)
 {
+  if(row1 < 0 || row1 >= A->rows || row2 < 0 || row2 >= A->rows)
+  {
+    printf("Matrix index out of range\n");
+    exit(0);
+  }
   for(int i = 0; i < A->cols; i++)
   {
     mat_element(A, row2, i) = (mat_element(A, row1, i) ^ mat_element(A, row2, i));
@@ -107,9 +127,14 @@ bin_matrix add_matrix(bin_matrix A, bin_matrix B)
   return temp;
 }
 
-//Function to swap two rows
+//Function to swap two rows of matrix A
 void swap(bin_matrix A, int row1, int row2)
 {
+  if(row1 < 0 || row1 >= A->rows || row2 < 0 || row2 >= A->rows)
+  {
+    printf("Matrix index out of range\n");
+    exit(0);
+  }
   int temp;
   for(int i = 0; i < A->cols; i++)
   {
@@ -145,9 +170,7 @@ bin_matrix matrix_rref(bin_matrix A)
       if(i == row_count)
       {
       	printf("Matix cannot be transformed into row echlon form...");
-        exit(1);	//vishal// should we do `return NULL' or something like that?
-                    //vishal// or shall we do `column_swap'?
-                    //vishal// because it may return a non echelon matrix otherwise.
+        exit(1);
       }
     }
     else
@@ -283,9 +306,14 @@ int mat_is_equal(bin_matrix A, bin_matrix B)
   return flag;
 }
 
-//Add row1 to row2
+//Add the elements of row1 to row2 in the column index range [a,b]  
 bin_matrix add_rows_new(bin_matrix A,int row1, int row2, int a, int b)
 {
+  if(row1 < 0 || row1 >= A->rows || row2 < 0 || row2 >= A->cols)
+  {
+    printf("Matrix index out of range\n");
+    exit(0);
+  }
   for(int i = a; i < b; i++)
   {
     mat_element(A, row2, i) = (mat_element(A, row1, i) ^ mat_element(A, row2, i));
@@ -293,9 +321,14 @@ bin_matrix add_rows_new(bin_matrix A,int row1, int row2, int a, int b)
   return A;
 }
 
-//Add col1 and col2
+//Add col1 and col2 from in the row index range [a,b]
 bin_matrix add_cols(bin_matrix A,int col1, int col2, int a, int b)
 {
+  if(col1 < 0 || col1 >= A->cols || col2 < 0 || col2 >= A->cols)
+  {
+    printf("Matrix index out of range\n");
+    exit(0);
+  }
   for(int i = a; i < b; i++)
   {
     mat_element(A, i, col2) = (mat_element(A, i, col1) ^ mat_element(A, i, col2));
