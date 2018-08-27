@@ -10,7 +10,7 @@ init: init.o matrix.o qc_mdpc.o mceliece.o utility.o
 	$(CC) init.o matrix.o mceliece.o qc_mdpc.o utility.o -o init
 
 keygen: key_gen.o matrix.o qc_mdpc.o utility.o
-	$(CC) key_gen.o matrix.o qc_mdpc.o  utility.o-o keygen
+	$(CC) key_gen.o matrix.o qc_mdpc.o  utility.o -o keygen
 
 encrypt: encrypt.o matrix.o qc_mdpc.o mceliece.o utility.o
 	$(CC) encrypt.o matrix.o mceliece.o qc_mdpc.o utility.o -o encrypt
