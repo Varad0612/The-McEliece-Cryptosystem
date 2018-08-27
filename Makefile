@@ -2,7 +2,7 @@ CC =gcc
 CFLAGS=-std=c99
 CPPFLAGS =
 
-TARGETS = init keygen encrypt decrypt min_dist
+TARGETS = init keygen encrypt decrypt
 
 all: run
 
@@ -14,9 +14,6 @@ keygen: key_gen.o matrix.o qc_mdpc.o utility.o
 
 encrypt: encrypt.o matrix.o qc_mdpc.o mceliece.o utility.o
 	$(CC) encrypt.o matrix.o mceliece.o qc_mdpc.o utility.o -o encrypt
-
-min_dist: min_dist.o matrix.o qc_mdpc.o mceliece.o utility.o
-	$(CC) min_dist.o matrix.o qc_mdpc.o mceliece.o utility.o -o min_dist
 
 decrypt: decrypt.o matrix.o qc_mdpc.o mceliece.o utility.o
 	$(CC) decrypt.o matrix.o mceliece.o qc_mdpc.o utility.o -o decrypt
