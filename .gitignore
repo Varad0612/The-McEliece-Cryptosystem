@@ -1,2 +1,3 @@
-*.o
+*a.o
 Varad0612-C-Implementation/run
+build_dir/*

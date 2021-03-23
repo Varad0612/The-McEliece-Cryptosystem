@@ -3,7 +3,18 @@
 CUDA based implementation of https://github.com/Varad0612/The-McEliece-Cryptosystem
 
 
+## How to build and run:
+First build the software:
+```bash
+$ mkdir -p build_dir && cd build_dir
+$ cmake ../src/
+$ make
+```
 
+and then run the program:
+```bash
+$ hamc_Solution -h
+```
 
 ## CPU based execution:
 
