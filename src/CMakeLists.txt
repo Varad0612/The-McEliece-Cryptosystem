@@ -110,7 +110,7 @@ endmacro(add_lab_helper)
 
 macro(add_lab_solution NAME SOURCES)
     if (BUILD_SOLUTION)
-        add_lab_helper("${NAME}_Solution" ${SOURCES})
+        add_lab_helper("${NAME}" ${SOURCES})
     endif(BUILD_SOLUTION)
 endmacro(add_lab_solution)
 
@@ -159,3 +159,4 @@ if (BUILD_LIBWB_LIBRARY)
 endif (BUILD_LIBWB_LIBRARY)
 
 include(hamc/sources.cmake)
+include(tests/sources.cmake)
