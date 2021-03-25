@@ -2,15 +2,16 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "wb.h"
+#include "RREF_cpu.c"
 
 static char *base_dir;
-#define ushort unsigned short
 
 static ushort *generate_data(int height, int width) {
   ushort *data = (ushort *)malloc(sizeof(ushort) * width * height);
   int i;
   for (i = 0; i < width * height; i++) {
-    data[i] = ((ushort)(rand() % 20) - 5) / 5.0f;
+    //data[i] = ((ushort)(rand() % 20) - 5) / 5.0f;
+    data[i] = (ushort)(rand() % 2);
   }
   return data;
 }
@@ -33,71 +34,6 @@ static void write_data(char *file_name, ushort *data, int height,
   }
   fflush(handle);
   fclose(handle);
-}
-
-
-#define mat_element(mat, cols, row_idx, col_idx) \
-  mat[(row_idx * cols) + col_idx]
-
-
-static void swap(ushort *A, int row1, int row2, int rows, int cols)
-{
-    int temp;
-    for(int i = 0; i < cols; i++)
-    {
-        temp = mat_element(A, cols, row1, i);
-        mat_element(A, cols, row1, i) = mat_element(A, cols, row2, i);
-        mat_element(A, cols, row2, i) = temp;
-    }
-}
-
-
-
-static void add_rows(ushort *A, int row1, int row2,
-        int rows, int cols)
-{
-  for(int i = 0; i < cols; i++)
-  {
-    mat_element(A, cols, row2, i) = \
-        (mat_element(A, cols, row1, i) ^ mat_element(A, cols, row2, i));
-  }
-}
-
-
-
-//Function to obtain the row reduced echlon form of a matrix A
-static void matrix_rref(ushort *A, ushort *B, int rows, int cols)
-{
-  ushort *temp = (ushort *)calloc(sizeof(ushort), rows * cols);
-  for (int i = 0; i < rows*cols;i++)
-      temp[i] = A[i];
-
-
-  int r = 0;
-  while(r < rows) {
-    if(mat_element(temp, cols, r, r) == 0) {
-      int i;
-      for(i = r + 1; i < rows; i++) {
-        if(mat_element(temp, cols, i, r) == 1) {
-          swap(temp, r, i, rows, cols);
-          break;
-        }
-      }
-      if(i == rows) {
-          printf("Matix cannot be transformed into row echlon form...");
-          exit(1);
-      }
-    }
-    else {
-      for(int i = 0; i < rows; i++) {
-        if(mat_element(temp, cols, i, r) == 1 && i != r) {
-          add_rows(temp, r, i, rows, cols);
-        }
-      }
-      r++;
-    }
-  }
-  return;
 }
 
 static void create_dataset(int datasetNum, int numARows, int numACols) {

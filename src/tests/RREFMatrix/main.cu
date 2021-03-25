@@ -6,9 +6,8 @@
 #include <stdio.h>
 #include <unistd.h>
 
+#include "RREF_cpu.c"
 #include "../../hamc/RREFMatrix.cu"
-
-#define uint uint16_t
 
 #define TILE_WIDTH 16
 
@@ -34,55 +33,76 @@ void printHelp()
 }
 
 
+void run_cpu(const char *in, const char*sol)
+{
+    int numARows, numAColumns;
+    ushort *hostA = (ushort *)wbImport(in, &numARows, &numAColumns);
+    ushort *hostC = (ushort *)malloc(numARows*numAColumns * sizeof(ushort));
+
+    matrix_rref(hostA, hostC, numARows, numAColumns);
+}
+
 
 int main(int argc, char *argv[])
 {
+    printf("RREF test:\n");
     wbArg_t args;
 
-    uint *hostA; // The A matrix
-    uint *hostC; // The output C matrix
-    uint *deviceA; // A matrix on device
-    uint *deviceB; // B matrix on device (copy of A)
-    uint *deviceC; // C matrix on device
+    ushort *hostA; // The A matrix
+    ushort *hostC; // The output C matrix
+    ushort *deviceA; // A matrix on device
+    ushort *deviceB; // B matrix on device (copy of A)
+    ushort *deviceC; // C matrix on device
     int numARows;    // number of rows in the matrix A
     int numAColumns; // number of columns in the matrix A
 
-    char *inputFileName, *outputFileName, *solutionFileName;
+    char *inputFileName;
+    char *solutionFileName;
+
+    cudaEvent_t astartEvent, astopEvent;
+    float aelapsedTime;
+    cudaEventCreate(&astartEvent);
+    cudaEventCreate(&astopEvent);
 
     int c;
     opterr = 0;
-    while ((c = getopt (argc, argv, "i:s:o:h")) != -1)
+    printf("1\n");
+    while ((c = getopt (argc, argv, "i:s:h")) != -1)
         switch(c)
         {
             case 'i':
-                strcpy(inputFileName, (const char*)optarg);
+                inputFileName = strdup(optarg);
                 break;
             case 's':
-                strcpy(solutionFileName, (const char*)optarg);
-                break;
-            case 'o':
-                strcpy(outputFileName, (const char*)optarg);
+                solutionFileName = strdup(optarg);
                 break;
             case 'h':
                 printHelp();
                 return 0;
             default:
                 abort();
-
         }
-
 
     args = wbArg_read(argc, argv);
 
 
+    printf("input file: %s\n", inputFileName);
+    printf("solution file: %s\n", solutionFileName);
+
+
+    wbTime_start(Compute, "Performing CPU computation for RREF");
+    run_cpu(inputFileName, solutionFileName);
+    wbTime_stop(Compute, "Performing CPU computation");
+
+
     /* allocate host data for matrix */
     wbTime_start(Generic, "Importing data and creating memory on host");
-    hostA = (uint *)wbImport(inputFileName, &numARows, &numAColumns);
+    hostA = (ushort *)wbImport(inputFileName, &numARows, &numAColumns);
     int numBRows = numARows;    // number of rows in the matrix B
     int numBColumns = numAColumns; // number of columns in the matrix B
     int numCRows = numARows;    // number of rows in the matrix C
     int numCColumns = numAColumns; // number of columns in the matrix C
-    hostC = (uint *)malloc(numCRows*numCColumns * sizeof(uint));
+    hostC = (ushort *)malloc(numCRows*numCColumns * sizeof(ushort));
     wbTime_stop(Generic, "Importing data and creating memory on host");
 
 
@@ -91,9 +111,9 @@ int main(int argc, char *argv[])
 
     /* allocate the memory space on GPU */
     wbTime_start(GPU, "Allocating GPU memory.");
-    cudaMalloc((void**) &deviceA, numARows * numAColumns * sizeof(uint));
-    cudaMalloc((void**) &deviceB, numBRows * numBColumns * sizeof(uint));
-    cudaMalloc((void**) &deviceC, numCRows * numCColumns * sizeof(uint));
+    cudaMalloc((void**) &deviceA, numARows * numAColumns * sizeof(ushort));
+    cudaMalloc((void**) &deviceB, numBRows * numBColumns * sizeof(ushort));
+    cudaMalloc((void**) &deviceC, numCRows * numCColumns * sizeof(ushort));
     wbTime_stop(GPU, "Allocating GPU memory.");
 
 
@@ -109,7 +129,7 @@ int main(int argc, char *argv[])
 
 
     wbTime_start(Copy, "Copying output memory to the CPU");
-    cudaMemcpy(hostC, deviceC, numCRows * numCColumns * sizeof(uint), cudaMemcpyDeviceToHost);
+    cudaMemcpy(hostC, deviceC, numCRows * numCColumns * sizeof(ushort), cudaMemcpyDeviceToHost);
     wbTime_stop(Copy, "Copying output memory to the CPU");
 
     /* Free GPU Memory */
